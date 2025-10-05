@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Organization Dashboard - Socio+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-building"></i> {{ current_user.name }} Dashboard</h1>
+        <a href="{{ url_for('create_opportunity') }}" class="btn btn-success btn-lg">
+            <i class="bi bi-plus-circle"></i> Post New Opportunity
+        </a>
+    </div>
+    
+    <!-- Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <h3>{{ opportunities|length }}</h3>
+                <p class="mb-0">Posted Opportunities</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <h3>{{ total_applications }}</h3>
+                <p class="mb-0">Total Applications</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <h3>{{ pending_applications }}</h3>
+                <p class="mb-0">Pending Reviews</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- My Posted Opportunities -->
+    <h2 class="mb-3"><i class="bi bi-list-task"></i> My Posted Opportunities</h2>
+    
+    {% if opportunities %}
+        {% for opp in opportunities %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h4>{{ opp.title }}</h4>
+                        <p class="text-muted mb-2">
+                            <i class="bi bi-geo-alt"></i> {{ opp.location }} | 
+                            <i class="bi bi-calendar"></i> {{ opp.date.strftime('%B %d, %Y') }} | 
+                            <i class="bi bi-person"></i> {{ opp.spots_available }} spots
+                        </p>
+                    </div>
+                    <span class="badge badge-{{ opp.status }}">{{ opp.status.title() }}</span>
+                </div>
+                
+                <p>{{ opp.description[:150] }}...</p>
+                
+                <!-- Applications for this opportunity -->
+                {% set opp_applications = opp.applications %}
+                {% if opp_applications %}
+                    <hr>
+                    <h5>Applications ({{ opp_applications|length }})</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Volunteer</th>
+                                    <th>Applied On</th>
+                                    <th>Message</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for app in opp_applications %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ app.volunteer.name }}</strong><br>
+                                        <small class="text-muted">{{ app.volunteer.email }}</small>
+                                    </td>
+                                    <td>{{ app.applied_at.strftime('%b %d, %Y') }}</td>
+                                    <td>{{ app.message[:50] }}...</td>
+                                    <td><span class="badge badge-{{ app.status }}">{{ app.status.title() }}</span></td>
+                                    <td>
+                                        {% if app.status == 'pending' %}
+                                            <form method="POST" action="{{ url_for('update_application', app_id=app.id) }}" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+                                                <button type="submit" name="action" value="accept" class="btn btn-sm btn-success" title="Accept">
+                                                    <i class="bi bi-check"></i>
+                                                </button>
+                                                <button type="submit" name="action" value="reject" class="btn btn-sm btn-danger" title="Reject">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No applications yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> You haven't posted any opportunities yet.
+            <a href="{{ url_for('create_opportunity') }}" class="alert-link">Create your first opportunity</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

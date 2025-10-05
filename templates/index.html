@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section text-center">
+    <div class="container">
+        <h1>Make a Difference Today</h1>
+        <p class="lead">Connect with volunteer opportunities that match your passion</p>
+        <div class="mt-4">
+            <a href="{{ url_for('opportunities') }}" class="btn btn-light btn-lg me-2">
+                <i class="bi bi-search"></i> Browse Opportunities
+            </a>
+            {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('register') }}" class="btn btn-outline-light btn-lg">
+                <i class="bi bi-person-plus"></i> Join Now
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container my-5">
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <i class="bi bi-people-fill text-primary" style="font-size: 3rem;"></i>
+                    <h3 class="mt-3">For Volunteers</h3>
+                    <p>Discover meaningful opportunities to give back to your community and develop new skills.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <i class="bi bi-building text-success" style="font-size: 3rem;"></i>
+                    <h3 class="mt-3">For Organizations</h3>
+                    <p>Post volunteer opportunities and connect with passionate individuals ready to help.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <i class="bi bi-heart-fill text-danger" style="font-size: 3rem;"></i>
+                    <h3 class="mt-3">Make Impact</h3>
+                    <p>Together, we create positive change in our communities, one volunteer at a time.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Section -->
+<div class="container my-5">
+    <div class="row text-center">
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <h3>{{ stats.total_opportunities }}</h3>
+                <p class="mb-0">Active Opportunities</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <h3>{{ stats.total_volunteers }}</h3>
+                <p class="mb-0">Registered Volunteers</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <h3>{{ stats.total_organizations }}</h3>
+                <p class="mb-0">Partner Organizations</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Opportunities -->
+<div class="container my-5">
+    <h2 class="text-center mb-4">Recent Opportunities</h2>
+    <div class="row">
+        {% for opp in recent_opportunities %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ opp.title }}</h5>
+                    <p class="card-text">
+                        <i class="bi bi-building text-muted"></i> {{ opp.organization.name }}<br>
+                        <i class="bi bi-geo-alt text-muted"></i> {{ opp.location }}<br>
+                        <i class="bi bi-calendar text-muted"></i> {{ opp.date.strftime('%B %d, %Y') }}
+                    </p>
+                    <a href="{{ url_for('opportunity_detail', opp_id=opp.id) }}" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No opportunities available yet. Check back soon!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="container my-5 text-center">
+    <div class="card bg-light">
+        <div class="card-body p-5">
+            <h2>Ready to Get Started?</h2>
+            <p class="lead">Join our community of volunteers and organizations today!</p>
+            {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Sign Up Now</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

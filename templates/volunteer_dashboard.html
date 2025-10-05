@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Volunteer Dashboard - Socio+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4"><i class="bi bi-person-circle"></i> Welcome, {{ current_user.name }}!</h1>
+    
+    <!-- Profile Info Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-person"></i> Your Profile</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Email:</strong> {{ current_user.email }}</p>
+            {% if current_user.phone %}
+                <p><strong>Phone:</strong> {{ current_user.phone }}</p>
+            {% endif %}
+            {% if current_user.location %}
+                <p><strong>Location:</strong> {{ current_user.location }}</p>
+            {% endif %}
+            <p><strong>Member Since:</strong> {{ current_user.created_at.strftime('%B %Y') }}</p>
+        </div>
+    </div>
+    
+    <!-- Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <h3>{{ applications|length }}</h3>
+                <p class="mb-0">Total Applications</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <h3>{{ accepted_count }}</h3>
+                <p class="mb-0">Accepted</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <h3>{{ pending_count }}</h3>
+                <p class="mb-0">Pending</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- My Applications -->
+    <h2 class="mb-3"><i class="bi bi-file-earmark-text"></i> My Applications</h2>
+    
+    {% if applications %}
+        <div class="row">
+            {% for app in applications %}
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0">{{ app.opportunity.title }}</h5>
+                            <span class="badge badge-{{ app.status }}">{{ app.status.title() }}</span>
+                        </div>
+                        <p class="card-text text-muted mb-2">
+                            <small>
+                                <i class="bi bi-building"></i> {{ app.opportunity.organization.name }}<br>
+                                <i class="bi bi-calendar"></i> {{ app.opportunity.date.strftime('%B %d, %Y') }}<br>
+                                <i class="bi bi-clock"></i> Applied {{ app.applied_at.strftime('%B %d, %Y') }}
+                            </small>
+                        </p>
+                        <p class="card-text"><strong>Your Message:</strong> {{ app.message[:100] }}...</p>
+                        <a href="{{ url_for('opportunity_detail', opp_id=app.opportunity.id) }}" class="btn btn-sm btn-primary">
+                            View Opportunity
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> You haven't applied to any opportunities yet.
+            <a href="{{ url_for('opportunities') }}" class="alert-link">Browse opportunities</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

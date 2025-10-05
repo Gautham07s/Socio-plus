@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Opportunities - Socio+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4"><i class="bi bi-compass"></i> Browse Volunteer Opportunities</h1>
+    
+    {% if opportunities %}
+        <div class="row">
+            {% for opp in opportunities %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <span class="badge badge-open mb-2">{{ opp.status.title() }}</span>
+                        <h5 class="card-title">{{ opp.title }}</h5>
+                        <p class="card-text text-muted">
+                            <small>
+                                <i class="bi bi-building"></i> {{ opp.organization.name }}<br>
+                                <i class="bi bi-geo-alt"></i> {{ opp.location }}<br>
+                                <i class="bi bi-calendar"></i> {{ opp.date.strftime('%B %d, %Y') }}<br>
+                                <i class="bi bi-clock"></i> {{ opp.duration or 'Not specified' }}<br>
+                                <i class="bi bi-person"></i> {{ opp.spots_available }} spots available
+                            </small>
+                        </p>
+                        <p class="card-text">{{ opp.description[:100] }}...</p>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <a href="{{ url_for('opportunity_detail', opp_id=opp.id) }}" class="btn btn-primary w-100">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle"></i> No opportunities available at the moment. Check back soon!
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}{{ opportunity.title }} - Socio+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="opportunity-detail">
+                <span class="badge badge-open mb-3">{{ opportunity.status.title() }}</span>
+                <h1 class="mb-4">{{ opportunity.title }}</h1>
+                
+                <div class="opportunity-info">
+                    <i class="bi bi-building"></i>
+                    <strong>Organization:</strong> {{ opportunity.organization.name }}
+                </div>
+                
+                <div class="opportunity-info">
+                    <i class="bi bi-geo-alt"></i>
+                    <strong>Location:</strong> {{ opportunity.location }}
+                </div>
+                
+                <div class="opportunity-info">
+                    <i class="bi bi-calendar"></i>
+                    <strong>Date:</strong> {{ opportunity.date.strftime('%B %d, %Y') }}
+                </div>
+                
+                <div class="opportunity-info">
+                    <i class="bi bi-clock"></i>
+                    <strong>Duration:</strong> {{ opportunity.duration or 'Not specified' }}
+                </div>
+                
+                <div class="opportunity-info">
+                    <i class="bi bi-person"></i>
+                    <strong>Spots Available:</strong> {{ opportunity.spots_available }}
+                </div>
+                
+                {% if opportunity.skills_required %}
+                <div class="opportunity-info">
+                    <i class="bi bi-tools"></i>
+                    <strong>Skills Required:</strong> {{ opportunity.skills_required }}
+                </div>
+                {% endif %}
+                
+                <hr class="my-4">
+                
+                <h4>Description</h4>
+                <p class="lead">{{ opportunity.description }}</p>
+                
+                {% if current_user.is_authenticated and current_user.role == 'volunteer' %}
+                    {% if has_applied %}
+                        <div class="alert alert-info mt-4">
+                            <i class="bi bi-check-circle"></i> You have already applied for this opportunity.
+                            <strong>Status: {{ application_status.title() }}</strong>
+                        </div>
+                    {% elif opportunity.status == 'open' %}
+                        <hr class="my-4">
+                        <h4>Apply for This Opportunity</h4>
+                        <form method="POST" action="{{ url_for('apply', opp_id=opportunity.id) }}">
+                            {{ form.hidden_tag() }}
+                            
+                            <div class="mb-3">
+                                {{ form.message.label(class="form-label") }}
+                                {{ form.message(class="form-control", rows="5") }}
+                                {% if form.message.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.message.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-send"></i> Submit Application
+                            </button>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-warning mt-4">
+                            This opportunity is currently closed for applications.
+                        </div>
+                    {% endif %}
+                {% elif not current_user.is_authenticated %}
+                    <div class="alert alert-info mt-4">
+                        <i class="bi bi-info-circle"></i> 
+                        Please <a href="{{ url_for('login') }}">login</a> or 
+                        <a href="{{ url_for('register') }}">register</a> as a volunteer to apply.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    About the Organization
+                </div>
+                <div class="card-body">
+                    <h5>{{ opportunity.organization.name }}</h5>
+                    {% if opportunity.organization.bio %}
+                        <p>{{ opportunity.organization.bio }}</p>
+                    {% endif %}
+                    {% if opportunity.organization.location %}
+                        <p><i class="bi bi-geo-alt"></i> {{ opportunity.organization.location }}</p>
+                    {% endif %}
+                    {% if opportunity.organization.phone %}
+                        <p><i class="bi bi-telephone"></i> {{ opportunity.organization.phone }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
